@@ -145,17 +145,15 @@ cp Assembly/Absolute_smallest_standalone_exec/smallest asm-raw
 
 6 + 18 + 6 + 12 + 2 = **44 variants**
 
-> **Note:** Build names follow the scheme described in "Naming Scheme". Files in `results/` (e.g. `results/summary.csv`) may still use the legacy names listed in the table at the end of this file; the mapping is one-to-one.
-
 ## Measurement Commands (Reference)
 
 ```bash
-# Per-variant timing: 10 warmup, 50 runs -> results/time/<name>.csv
-hyperfine --warmup 10 --runs 50 --export-csv results/time/<name>.csv ./<name>
+# Per-variant timing: 10 warmup, 50 runs
+hyperfine --warmup 10 --runs 50 ./<name>
 
 # Max RSS
 /usr/bin/time -v ./<name> | grep "Maximum resident set size"
 
 # Syscall trace
-strace -c ./<name>   # (see results/strace/)
+strace -c ./<name>
 ```
