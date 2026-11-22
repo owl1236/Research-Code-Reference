@@ -11,7 +11,7 @@ Every variant is a "Hello, World!" program compiled as ELF32 (i386) from one of 
 -   **gcc / g++:** Debian 16.2.0-1 (16.2.0)
 -   **GNU ld / as:** Binutils 2.47
 -   **NASM:** 3.01
--   **32-bit support:** `libc6-dev-i38` + `gcc-multilib` installed
+-   **32-bit support:** `libc6-dev-i386` + `gcc-multilib` installed
 
 ## Sources Used
 
