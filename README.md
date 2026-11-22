@@ -3,7 +3,7 @@ Analysis of Modern Executable Bloat and Performance Trade-offs in Minimal Progra
 
 # Compilation Commands — All 44 Variants
 
-Every variant is a "Hello, World!" program compiled as ELF32 (i386) from one of the 7 source files in `c/`, `cpp/`, and `Assembly/`. 
+Every variant is a "Hello, World!" program compiled as ELF32 (i386) from one of the 7 source files in `c/`, `cpp/`, and `Assembly/`.
 
 ## Environment
 
@@ -27,116 +27,125 @@ Every variant is a "Hello, World!" program compiled as ELF32 (i386) from one of 
 | `Assembly/Default_smallest_no_header_override/hello_world.asm` | NASM (elf32) | `int 0x80` write |
 | `Assembly/Absolute_smallest_standalone_exec/smallest.asm` | hand-crafted raw ELF32 | `int 0x80` write |
 
+## Naming Scheme
+
+Every build is named `language-routine-linking-optimization`:
+
+| Part | Values |
+| :--- | :--- |
+| language | `cpp` (C++), `c` (C) |
+| routine | `stream` (`std::cout`, C++ only), `printf`, `puts`, `write` (raw `write()`) |
+| linking-optimization | see "Flag Sets" below |
+
+The two assembly builds are named `asm-linked` and `asm-raw`.
+
 ## Flag Sets (Applied to Each Language/Technique)
 
-| Suffix | Flags |
+| Linking-optimization | Flags |
 | :--- | :--- |
-| `(none)` | default (`-O0`) |
-| `_O2` | `-O2` |
-| `_Os` | `-Os` |
-| `_static` | `-static` |
-| `_static_Os` | `-static -Os` |
-| `_static_Os_stripped` | `-static -Os -s` |
+| `dynamic-O0` | default, no optimization flag (`-O0`) |
+| `dynamic-O2` | `-O2` |
+| `dynamic-Os` | `-Os` |
+| `static-O0` | `-static` |
+| `static-Os` | `-static -Os` |
+| `static-Os-stripped` | `-static -Os -s` |
 
 ---
 
 ## Phase 1 — C++ Baseline (iostream) — 6 Variants
-
 ```bash
-g++ cpp/hello_iostream.cpp -m32                          -o hello_cpp_O0
-g++ cpp/hello_iostream.cpp -m32 -O2                      -o hello_cpp_O2
-g++ cpp/hello_iostream.cpp -m32 -Os                      -o hello_cpp_Os
-g++ cpp/hello_iostream.cpp -m32 -static                  -o hello_cpp_static
-g++ cpp/hello_iostream.cpp -m32 -static -Os              -o hello_cpp_static_Os
-g++ cpp/hello_iostream.cpp -m32 -static -Os -s           -o hello_cpp_static_Os_stripped
+g++ cpp/hello_iostream.cpp -m32                 -o cpp-stream-dynamic-O0
+g++ cpp/hello_iostream.cpp -m32 -O2             -o cpp-stream-dynamic-O2
+g++ cpp/hello_iostream.cpp -m32 -Os             -o cpp-stream-dynamic-Os
+g++ cpp/hello_iostream.cpp -m32 -static         -o cpp-stream-static-O0
+g++ cpp/hello_iostream.cpp -m32 -static -Os     -o cpp-stream-static-Os
+g++ cpp/hello_iostream.cpp -m32 -static -Os -s  -o cpp-stream-static-Os-stripped
 ```
-## Phase 2 — C++ Optimization Techniques (printf / puts / write) — 18 Variants
 
+## Phase 2 — C++ Optimization Techniques (printf / puts / write) — 18 Variants
 ### printf
 ```bash
-g++ cpp/hello_printf.cpp -m32                            -o hello_cpp_printf_O0
-g++ cpp/hello_printf.cpp -m32 -O2                        -o hello_cpp_printf_O2
-g++ cpp/hello_printf.cpp -m32 -Os                        -o hello_cpp_printf_Os
-g++ cpp/hello_printf.cpp -m32 -static                    -o hello_cpp_printf_static
-g++ cpp/hello_printf.cpp -m32 -static -Os                -o hello_cpp_printf_static_Os
-g++ cpp/hello_printf.cpp -m32 -static -Os -s             -o hello_cpp_printf_static_Os_stripped
+g++ cpp/hello_printf.cpp -m32                 -o cpp-printf-dynamic-O0
+g++ cpp/hello_printf.cpp -m32 -O2             -o cpp-printf-dynamic-O2
+g++ cpp/hello_printf.cpp -m32 -Os             -o cpp-printf-dynamic-Os
+g++ cpp/hello_printf.cpp -m32 -static         -o cpp-printf-static-O0
+g++ cpp/hello_printf.cpp -m32 -static -Os     -o cpp-printf-static-Os
+g++ cpp/hello_printf.cpp -m32 -static -Os -s  -o cpp-printf-static-Os-stripped
 ```
 
 ### puts
 ```bash
-g++ cpp/hello_puts.cpp -m32                              -o hello_cpp_puts_O0
-g++ cpp/hello_puts.cpp -m32 -O2                          -o hello_cpp_puts_O2
-g++ cpp/hello_puts.cpp -m32 -Os                          -o hello_cpp_puts_Os
-g++ cpp/hello_puts.cpp -m32 -static                      -o hello_cpp_puts_static
-g++ cpp/hello_puts.cpp -m32 -static -Os                  -o hello_cpp_puts_static_Os
-g++ cpp/hello_puts.cpp -m32 -static -Os -s               -o hello_cpp_puts_static_Os_stripped
+g++ cpp/hello_puts.cpp -m32                 -o cpp-puts-dynamic-O0
+g++ cpp/hello_puts.cpp -m32 -O2             -o cpp-puts-dynamic-O2
+g++ cpp/hello_puts.cpp -m32 -Os             -o cpp-puts-dynamic-Os
+g++ cpp/hello_puts.cpp -m32 -static         -o cpp-puts-static-O0
+g++ cpp/hello_puts.cpp -m32 -static -Os     -o cpp-puts-static-Os
+g++ cpp/hello_puts.cpp -m32 -static -Os -s  -o cpp-puts-static-Os-stripped
 ```
 
 ### write (raw syscall wrapper)
 ```bash
-g++ cpp/hello_write.cpp -m32                             -o hello_cpp_write_O0
-g++ cpp/hello_write.cpp -m32 -O2                         -o hello_cpp_write_O2
-g++ cpp/hello_write.cpp -m32 -Os                         -o hello_cpp_write_Os
-g++ cpp/hello_write.cpp -m32 -static                     -o hello_cpp_write_static
-g++ cpp/hello_write.cpp -m32 -static -Os                 -o hello_cpp_write_static_Os
-g++ cpp/hello_write.cpp -m32 -static -Os -s              -o hello_cpp_write_static_Os_stripped
+g++ cpp/hello_write.cpp -m32                 -o cpp-write-dynamic-O0
+g++ cpp/hello_write.cpp -m32 -O2             -o cpp-write-dynamic-O2
+g++ cpp/hello_write.cpp -m32 -Os             -o cpp-write-dynamic-Os
+g++ cpp/hello_write.cpp -m32 -static         -o cpp-write-static-O0
+g++ cpp/hello_write.cpp -m32 -static -Os     -o cpp-write-static-Os
+g++ cpp/hello_write.cpp -m32 -static -Os -s  -o cpp-write-static-Os-stripped
 ```
 
 ## Phase 3 — C Baseline (printf) — 6 Variants
-
 ```bash
-gcc c/hello_printf.c -m32                                -o hello_c_O0
-gcc c/hello_printf.c -m32 -O2                            -o hello_c_O2
-gcc c/hello_printf.c -m32 -Os                            -o hello_c_Os
-gcc c/hello_printf.c -m32 -static                        -o hello_c_static
-gcc c/hello_printf.c -m32 -static -Os                    -o hello_c_static_Os
-gcc c/hello_printf.c -m32 -static -Os -s                 -o hello_c_static_Os_stripped
+gcc c/hello_printf.c -m32                 -o c-printf-dynamic-O0
+gcc c/hello_printf.c -m32 -O2             -o c-printf-dynamic-O2
+gcc c/hello_printf.c -m32 -Os             -o c-printf-dynamic-Os
+gcc c/hello_printf.c -m32 -static         -o c-printf-static-O0
+gcc c/hello_printf.c -m32 -static -Os     -o c-printf-static-Os
+gcc c/hello_printf.c -m32 -static -Os -s  -o c-printf-static-Os-stripped
 ```
 
 ## Phase 4 — C Optimization Techniques (puts / write) — 12 Variants
-
 ### puts
 ```bash
-gcc c/hello_puts.c -m32                                  -o hello_c_puts_O0
-gcc c/hello_puts.c -m32 -O2                              -o hello_c_puts_O2
-gcc c/hello_puts.c -m32 -Os                              -o hello_c_puts_Os
-gcc c/hello_puts.c -m32 -static                          -o hello_c_puts_static
-gcc c/hello_puts.c -m32 -static -Os                      -o hello_c_puts_static_Os
-gcc c/hello_puts.c -m32 -static -Os -s                   -o hello_c_puts_static_Os_stripped
+gcc c/hello_puts.c -m32                 -o c-puts-dynamic-O0
+gcc c/hello_puts.c -m32 -O2             -o c-puts-dynamic-O2
+gcc c/hello_puts.c -m32 -Os             -o c-puts-dynamic-Os
+gcc c/hello_puts.c -m32 -static         -o c-puts-static-O0
+gcc c/hello_puts.c -m32 -static -Os     -o c-puts-static-Os
+gcc c/hello_puts.c -m32 -static -Os -s  -o c-puts-static-Os-stripped
 ```
 
 ### write (raw syscall wrapper)
 ```bash
-gcc c/hello_write.c -m32                                 -o hello_c_write_O0
-gcc c/hello_write.c -m32 -O2                             -o hello_c_write_O2
-gcc c/hello_write.c -m32 -Os                             -o hello_c_write_Os
-gcc c/hello_write.c -m32 -static                         -o hello_c_write_static
-gcc c/hello_write.c -m32 -static -Os                     -o hello_c_write_static_Os
-gcc c/hello_write.c -m32 -static -Os -s                  -o hello_c_write_static_Os_stripped
+gcc c/hello_write.c -m32                 -o c-write-dynamic-O0
+gcc c/hello_write.c -m32 -O2             -o c-write-dynamic-O2
+gcc c/hello_write.c -m32 -Os             -o c-write-dynamic-Os
+gcc c/hello_write.c -m32 -static         -o c-write-static-O0
+gcc c/hello_write.c -m32 -static -Os     -o c-write-static-Os
+gcc c/hello_write.c -m32 -static -Os -s  -o c-write-static-Os-stripped
 ```
 
 ## Phase 5 — Assembly — 2 Variants
 
-### hello_asm_default (280 B) — NASM elf32 object + default linker
+### asm-linked (280 B) — NASM elf32 object + default linker
 ```bash
 nasm -f elf32 Assembly/Default_smallest_no_header_override/hello_world.asm -o /tmp/hw.o
-ld   -m elf_i386 -N -s /tmp/hw.o -o hello_asm_default
+ld   -m elf_i386 -N -s /tmp/hw.o -o asm-linked
 ```
 
-### hello_asm_smallest (62 B) — hand-crafted raw ELF, no loader needed
+### asm-raw (62 B) — hand-crafted raw ELF, no loader needed
 The file is a complete executable in itself (ELF magic + program header + code hand-encoded in `smallest.asm`). It is assembled as flat binary and copied as-is:
 
 ```bash
-nasm -f bin Assembly/Absolute_smallest_standalone_exec/smallest.asm -o hello_asm_smallest
+nasm -f bin Assembly/Absolute_smallest_standalone_exec/smallest.asm -o asm-raw
 # equivalent to the original build, which shipped the pre-assembled file:
-cp Assembly/Absolute_smallest_standalone_exec/smallest hello_asm_smallest
+cp Assembly/Absolute_smallest_standalone_exec/smallest asm-raw
 ```
 
 ## Total
 
 6 + 18 + 6 + 12 + 2 = **44 variants**
 
-> **Note:** The default (no-flag) builds are named `*_O0` to match the columns in `results/summary.csv`.
+> **Note:** Build names follow the scheme described in "Naming Scheme". Files in `results/` (e.g. `results/summary.csv`) may still use the legacy names listed in the table at the end of this file; the mapping is one-to-one.
 
 ## Measurement Commands (Reference)
 
@@ -150,3 +159,57 @@ hyperfine --warmup 10 --runs 50 --export-csv results/time/<name>.csv ./<name>
 # Syscall trace
 strace -c ./<name>   # (see results/strace/)
 ```
+
+## Legacy Names
+
+<details>
+<summary>Mapping from current build names to the names used in earlier files</summary>
+
+| Current name | Legacy name |
+| :--- | :--- |
+| `cpp-stream-dynamic-O0` | `hello_cpp_O0` |
+| `cpp-stream-dynamic-O2` | `hello_cpp_O2` |
+| `cpp-stream-dynamic-Os` | `hello_cpp_Os` |
+| `cpp-stream-static-O0` | `hello_cpp_static` |
+| `cpp-stream-static-Os` | `hello_cpp_static_Os` |
+| `cpp-stream-static-Os-stripped` | `hello_cpp_static_Os_stripped` |
+| `cpp-printf-dynamic-O0` | `hello_cpp_printf_O0` |
+| `cpp-printf-dynamic-O2` | `hello_cpp_printf_O2` |
+| `cpp-printf-dynamic-Os` | `hello_cpp_printf_Os` |
+| `cpp-printf-static-O0` | `hello_cpp_printf_static` |
+| `cpp-printf-static-Os` | `hello_cpp_printf_static_Os` |
+| `cpp-printf-static-Os-stripped` | `hello_cpp_printf_static_Os_stripped` |
+| `cpp-puts-dynamic-O0` | `hello_cpp_puts_O0` |
+| `cpp-puts-dynamic-O2` | `hello_cpp_puts_O2` |
+| `cpp-puts-dynamic-Os` | `hello_cpp_puts_Os` |
+| `cpp-puts-static-O0` | `hello_cpp_puts_static` |
+| `cpp-puts-static-Os` | `hello_cpp_puts_static_Os` |
+| `cpp-puts-static-Os-stripped` | `hello_cpp_puts_static_Os_stripped` |
+| `cpp-write-dynamic-O0` | `hello_cpp_write_O0` |
+| `cpp-write-dynamic-O2` | `hello_cpp_write_O2` |
+| `cpp-write-dynamic-Os` | `hello_cpp_write_Os` |
+| `cpp-write-static-O0` | `hello_cpp_write_static` |
+| `cpp-write-static-Os` | `hello_cpp_write_static_Os` |
+| `cpp-write-static-Os-stripped` | `hello_cpp_write_static_Os_stripped` |
+| `c-printf-dynamic-O0` | `hello_c_O0` |
+| `c-printf-dynamic-O2` | `hello_c_O2` |
+| `c-printf-dynamic-Os` | `hello_c_Os` |
+| `c-printf-static-O0` | `hello_c_static` |
+| `c-printf-static-Os` | `hello_c_static_Os` |
+| `c-printf-static-Os-stripped` | `hello_c_static_Os_stripped` |
+| `c-puts-dynamic-O0` | `hello_c_puts_O0` |
+| `c-puts-dynamic-O2` | `hello_c_puts_O2` |
+| `c-puts-dynamic-Os` | `hello_c_puts_Os` |
+| `c-puts-static-O0` | `hello_c_puts_static` |
+| `c-puts-static-Os` | `hello_c_puts_static_Os` |
+| `c-puts-static-Os-stripped` | `hello_c_puts_static_Os_stripped` |
+| `c-write-dynamic-O0` | `hello_c_write_O0` |
+| `c-write-dynamic-O2` | `hello_c_write_O2` |
+| `c-write-dynamic-Os` | `hello_c_write_Os` |
+| `c-write-static-O0` | `hello_c_write_static` |
+| `c-write-static-Os` | `hello_c_write_static_Os` |
+| `c-write-static-Os-stripped` | `hello_c_write_static_Os_stripped` |
+| `asm-linked` | `hello_asm_default` |
+| `asm-raw` | `hello_asm_smallest` |
+
+</details>
